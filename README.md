@@ -1,2 +1,2 @@
 # C-
-learning C Sharp code
+這是一個讀取和寫入Ini 檔案的範例。
