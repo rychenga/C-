@@ -10,6 +10,7 @@ string appPath = Path.GetDirectoryName(Application.ExecutablePath);
 
 
 Directory of any loaded assembly (.exe or .dll)
+
 [C#]
 using System.IO;
 using System.Reflection;
