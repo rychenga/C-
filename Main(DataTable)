@@ -49,7 +49,7 @@ namespace ODBCOracle
                 {
                     foreach(System.Data.DataColumn col in GetDataTable.Columns)
                     {
-                        Console.WriteLine(pri[col]);
+                        Console.WriteLine("{0}:{1}",col,pri[col]);
                     }
                 }
 
