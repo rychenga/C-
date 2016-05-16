@@ -1,0 +1,57 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ODBCOracle
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            try
+            {
+                string _sDB;
+                string _sUser;
+                string _sPwd;
+                string _sPath = "D:\\WORK\\C#\\20160516\\demo.ini";
+
+                //讀取ini by Source for DB
+                _sDB = Actini.Program.ReadIni("Source", "DB", _sPath);
+                //讀取ini by Source for User
+                _sUser = Actini.Program.ReadIni("Source", "UID", _sPath);
+                //讀取ini by Source for Pwd""
+                _sPwd = Actini.Program.ReadIni("Source", "pwd", _sPath);
+                //Console.WriteLine("DB_NAME:{0} User_Name:{1} Password:{2}", _sDB, _sUser, _sPwd);
+                
+                //宣告connectString 
+                string _sConnectString = "DSN="+_sDB+";UID="+_sUser+";PWD="+_sPwd+";";
+
+                //宣告sqlcmd
+                string _sSqlcmd = "select * from LEGAL t where t.day = to_date('2014/05/06','yyyy/mm/dd')";
+
+                //建立ODBC Adapter
+                System.Data.Odbc.OdbcDataAdapter adapter = new System.Data.Odbc.OdbcDataAdapter(_sSqlcmd,_sConnectString);
+
+                //建立一個DATASET
+                System.Data.DataSet Getdata = new System.Data.DataSet();
+
+                //adapter fill data into Getdata(DATASET)
+                adapter.Fill(Getdata,"name");
+
+                foreach (System.Data.DataRow pri in Getdata.Tables["name"].Rows)
+                {
+                    Console.WriteLine(pri["name"]);
+                }
+                
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+            Console.ReadKey();
+        }
+    }
+}
