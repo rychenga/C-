@@ -40,11 +40,19 @@ namespace ODBCOracle
                 //adapter fill data into GetDataTable(DataTable)
                 adapter.Fill(GetDataTable);
 
+                //foreach (System.Data.DataRow pri in GetDataTable.Rows)
+                //{
+                //    Console.WriteLine("{0}{1}",pri[0],pri[1]);
+                //}
+
                 foreach (System.Data.DataRow pri in GetDataTable.Rows)
                 {
-                    Console.WriteLine("{0}{1}",pri[0],pri[1]);
+                    foreach(System.Data.DataColumn col in GetDataTable.Columns)
+                    {
+                        Console.WriteLine(pri[col]);
+                    }
                 }
-                
+
 
             }
             catch (Exception e)
