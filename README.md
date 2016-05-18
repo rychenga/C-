@@ -11,6 +11,10 @@ http://cs0.wikidot.com/crawler
 
 http://white5168.blogspot.tw/2015/10/crawler5getpost.html#.VzxzR_l979Q
 
+http://blog.xuite.net/gyes.gyes/blog/63294651-c%23+%E6%93%B7%E5%8F%96%E7%B6%B2%E9%A0%81%E8%B3%87%E6%96%99
+
+https://dotblogs.com.tw/jaigi/2012/09/29/75169
+
 
 網路爬蟲系列 (Crawler)(4)：Get與Post觀念介紹
    
