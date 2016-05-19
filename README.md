@@ -15,6 +15,9 @@ http://blog.xuite.net/gyes.gyes/blog/63294651-c%23+%E6%93%B7%E5%8F%96%E7%B6%B2%E
 
 https://dotblogs.com.tw/jaigi/2012/09/29/75169
 
+http://13590.cnblogs.com/archive/2006/05/24/407967.html
+
+path= http://jdata.yuanta.com.tw/Z/zg/zgk_d.djhtm
 
 網路爬蟲系列 (Crawler)(4)：Get與Post觀念介紹
    
