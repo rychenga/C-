@@ -24,7 +24,8 @@ namespace Actini
         public static string ReadIni(string section, string key,string Path)
         {
             string sRec;
-            StringBuilder record = new StringBuilder();
+            //StringBuilder record = new StringBuilder();
+            StringBuilder record = new StringBuilder(255);
             GetPrivateProfileString(section,key, "", record, 255, Path);
             sRec = record.ToString();
             return sRec;
