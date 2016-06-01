@@ -20,8 +20,7 @@ http://mogerwu.pixnet.net/blog/post/28856780-c%23%E7%A8%8B%E5%BC%8F%E4%B8%AD%E5%
           if (finfo.Directory.Exists == false) {
               finfo.Directory.Create();
           }
-          string writeString = string.Format("{0:yyyy/MM/dd HH:mm:ss} {1}", 
-              DateTime.Now, message) + Environment.NewLine;
+          string writeString = string.Format("{0:yyyy/MM/dd HH:mm:ss} {1}", DateTime.Now, message) + Environment.NewLine;
           File.AppendAllText(filename, writeString, Encoding.Unicode);
       }
   }
