@@ -1,44 +1,82 @@
 http://www.cnblogs.com/xishuai/p/3469871.html
 
-public static OracleLob GetOracleClob(string strValue)
-        {
-            using (OracleConnection connection = new OracleConnection(connectionString))
-            {
-                try
-                {
-                    connection.Open();
-                    string str = strValue;
-                    byte[] array = Encoding.Unicode.GetBytes(str);
-                    if (array.Length % 2 != 0)
-                    {
-                        array = Encoding.Unicode.GetBytes(str + ' ');
-                    }
-                    OracleCommand lobCmd = connection.CreateCommand();
-                    // 为访问表定义一个游标 clobvar
-                    string cmdSql = "DECLARE clobvar CLOB;";
-                    cmdSql += " begin ";
-                    cmdSql += " dbms_lob.createtemporary(clobvar, false, 0); :tempLob:= clobvar; ";
-                    cmdSql += " end;";
-                    lobCmd.CommandText = cmdSql;
-                    lobCmd.Parameters.Add(new OracleParameter("tempLob", OracleType.Clob)).Direction = ParameterDirection.Output;
-                    lobCmd.ExecuteNonQuery();
+.Net處理Oracle中Clob類型字段總結
+最近在做項目中用到Clob這個字段，Clob是存儲無限長字符的Oracle字段，用的時候網上找資料找了好久，內容不是很多，大部分都不能用，當然也有可以用的，測試了不同版本，整理了一下，給大家在做項目的時候以參考。
 
-                    // 利用事务处理（必须）
-                    OracleTransaction tx = connection.BeginTransaction();
-                    lobCmd.Transaction = tx;
+表操作
+　　第一種方案很簡單，是數據庫表中的某個字段是Clob類型，需要對這個表進行增加修改，網上有很多版本，我試了一種最簡單的：
 
-                    // 定义一个临时变量
-                    OracleLob tempLob = (OracleLob)lobCmd.Parameters["tempLob"].Value;
-                    tempLob.BeginBatch(OracleLobOpenMode.ReadWrite);
-                    tempLob.Write(array, 0, array.Length);
-                    tempLob.EndBatch();
-                    // 提交事务
-                    tx.Commit();
-                    return tempLob;
-                }
-                catch (Exception e)
-                {
-                    throw e;
-                }
-            }
-        }
+　　　　new OracleParameter(":Test", OracleType.Clob,System.Text.Encoding.Unicode.GetByteCount(model.Test)),
+
+
+　　就是在創建參數的時候指定一個長度，為什麼這樣寫，不是很清楚，我試過超過4000字符存儲和修改是沒什麼問題的。下面給參數賦值直接賦值就行了，就那麼簡單！
+
+參數操作
+第一種是對錶中Clob的操作，還有一種情況是，在Oracle中定義的存儲過程和函數，參數的類型是Clob類型，如果用第一種方式的話就會報錯，字符超過最大，我想是雖然參數類型是Clob但是傳過去的是字符，Oracle默認應該是把傳過來的值當做字符看待了，第一種不行，就找了另一種實現方法，我們看下：
+
+複製代碼
+        public static OracleLob GetOracleClob(string strValue)
+        {
+            using (OracleConnection connection = new OracleConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    string str = strValue;
+                    byte[] array = Encoding.Unicode.GetBytes(str);
+                    if (array.Length % 2 != 0)
+                    {
+                        array = Encoding.Unicode.GetBytes(str + ' ');
+                    }
+                    OracleCommand lobCmd = connection.CreateCommand();
+                    // 為訪問表定義一個游標 clobvar
+                    string cmdSql = "DECLARE clobvar CLOB;";
+                    cmdSql += " begin ";
+                    cmdSql += " dbms_lob.createtemporary(clobvar, false, 0); :tempLob:= clobvar; ";
+                    cmdSql += " end;";
+                    lobCmd.CommandText = cmdSql;
+                    lobCmd.Parameters.Add(new OracleParameter("tempLob", OracleType.Clob)).Direction = ParameterDirection.Output;
+                    lobCmd.ExecuteNonQuery();
+
+                    // 利用事務處理（必須）
+                    OracleTransaction tx = connection.BeginTransaction();
+                    lobCmd.Transaction = tx;
+
+                    // 定義一個臨時變量
+                    OracleLob tempLob = (OracleLob)lobCmd.Parameters["tempLob"].Value;
+                    tempLob.BeginBatch(OracleLobOpenMode.ReadWrite);
+                    tempLob.Write(array, 0, array.Length);
+                    tempLob.EndBatch();
+                    // 提交事務
+                    tx.Commit();
+                    return tempLob;
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                }
+            }
+        }
+
+
+            parameters[0].Value = DbHelperOra.GetOracleClob(TestString);
+大家看代碼可能明白一些，這裡我說下自己的理解，先定義一個Byte，然後拼一個輸出Clob類型的字符串，在Oracle執行後輸出，然後把Byte寫入輸出的Clob變量，然後提交事務，我覺得得到的這個Clob類型才是真正的Clob類型，是和Oracle那邊是一致的。這邊有一個重要的是字符的編碼，注意下要和Oracle那邊要一致！
+
+
+http://www.it610.com/article/2073361.htm
+
+當通過insert語句直接插入一段文本或者html字符串試，超過4000字符時候，就會報：
+ORA-01489: 字符串連接的結果過長
+雖然字段是clob，足以存儲，但是通過這種直接插入的時候，因為沒有強制指定帶插入字符串為clob類型，
+oracle會把插入的字符串作為 “字符串類型”處理，由於oracle有最大字符串限制（不超過4000個字符），所以會報錯。
+解決思路：指定待插入字符串類型為clob，將長字符串存到clob變量中，可以使用過程或存儲過程
+例子：
+DECLARE
+ REALLYBIGTEXTSTRING CLOB := '待插入的海量字符串';
+BEGIN
+   INSERT INTO test_table VALUES('test', REALLYBIGTEXTSTRING, '0');
+end ;
+commit;
+這樣就可以解決問題。
+
+oracle clob 存儲大於4000字符的字符串
