@@ -1,0 +1,143 @@
+http://study.qqcf.com/web/714/204085.htm
+
+我想將一個string類型的字符串（>4000字節）插入到oracle數據庫中的clob字段中去，該如何操作呢？ (c#)
+
+using System;
+using System.Text;
+using Oracle.DataAccess.Types;
+using Oracle.DataAccess.Client;
+
+namespace ConsoleApplication23
+{
+      /// <summary>
+      /// Summary description for Class1.
+      /// </summary>
+ 
+      class Class1
+      {
+            /// <summary>
+            /// The main entry point for the application.
+            /// </summary>
+ 
+            [STAThread]
+
+            static void Main(string[] args)
+            {
+
+                  // Step 1
+                   // Establish connection using ODP.NET
+                  // NOTE: Modify User Id, Password, Data Source as per your database setup
+                  string connectStr = "User Id=scott;Password=tiger;Data Source=orcl9i";
+
+                  OracleConnection connection = new OracleConnection(connectStr);
+                  connection.Open();
+                  Console.WriteLine("Connected to database");
+                  Console.WriteLine(" ");
+
+
+                  // Step 2
+                  // Declare Oracle objects
+                  OracleTransaction txn; 
+                  OracleCommand cmd = new OracleCommand("",connection);
+                  OracleDataReader reader;
+                  OracleClob clob;
+           
+                  try
+                  {
+                        // Step 3
+                        // Start a transaction
+                        txn = connection.BeginTransaction();
+ 
+
+                        // Step 4
+                        // Lock the result set using the "FOR UPDATE" clause
+                        cmd.CommandText = "SELECT story FROM multimedia_tab FOR UPDATE";
+                        reader = cmd.ExecuteReader();
+                    
+                        
+                        // Step 5
+                        // Read data from OracleDataReader using a proper typed accessor
+                        // to an Oracle LOB object
+
+                        reader.Read();
+                        clob = reader.GetOracleClob(0);
+                        Console.WriteLine("Old Data: {0}", clob.Value);
+                        Console.WriteLine(" ");
+  
+                        
+                        // Step 6
+                        // Modify the CLOB column of the row
+                        string ending = " The end.";
+
+                        // Append CLOB data to the current OracleCLOB instance
+                        clob.Append(ending.ToCharArray(), 0, ending.Length);      
+
+                        // Release the lock
+                        txn.Commit();
+                        Console.Write("Updated to new data:");
+                  } 
+            catch (Exception e)
+                  {
+                        Console.WriteLine("Error: {0}", e.Message);
+
+                  }
+ 
+            try
+                  {
+                  // Step 7
+                  // Fetch the modified data from the database
+                  // Lock the complete resultset using the "FOR UPDATE" clause
+                  cmd.CommandText = "SELECT story FROM multimedia_tab FOR UPDATE";
+                   reader = cmd.ExecuteReader();
+                  reader.Read();
+                  clob = reader.GetOracleClob(0);
+                        Console.WriteLine( clob.Value);
+                  Console.WriteLine(" ");
+
+                  // Step 8
+                  // Reset data with the old value
+                  // Start an Oracle transaction
+                  txn = connection.BeginTransaction();
+
+                  // Clear the contents of the current instance of OracleCLOB object
+                  clob.Erase();
+
+                  // Re-write a string to the old value
+                  StringBuilder blr1 = new StringBuilder();
+                  blr1.Append("'This is a long story. Once upon a time ...',");
+                  String oldData = blr1.ToString();
+
+
+                  // Step 9
+                  // Write the byte array into the OracleCLOB object
+                  clob.Write(oldData.ToCharArray(),0, oldData.Length);
+
+                
+
+                  // Update the data and release the lock
+                  txn.Commit();
+
+
+                        Console.WriteLine("Old data again: {0}", clob.Value);
+            
+            } 
+
+            catch (Exception e)
+            {
+                  Console.WriteLine("Error: {0}", e.Message);
+            }
+        
+      finally
+            {
+
+                  // Dispose OracleCommand object
+                  cmd.Dispose();
+
+                  // Close and Dispose OracleConnection object
+                  connection.Close();
+                  connection.Dispose();
+            }           
+            }
+      }
+
+}
