@@ -1,0 +1,44 @@
+http://www.cnblogs.com/xishuai/p/3469871.html
+
+public static OracleLob GetOracleClob(string strValue)
+        {
+            using (OracleConnection connection = new OracleConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    string str = strValue;
+                    byte[] array = Encoding.Unicode.GetBytes(str);
+                    if (array.Length % 2 != 0)
+                    {
+                        array = Encoding.Unicode.GetBytes(str + ' ');
+                    }
+                    OracleCommand lobCmd = connection.CreateCommand();
+                    // 为访问表定义一个游标 clobvar
+                    string cmdSql = "DECLARE clobvar CLOB;";
+                    cmdSql += " begin ";
+                    cmdSql += " dbms_lob.createtemporary(clobvar, false, 0); :tempLob:= clobvar; ";
+                    cmdSql += " end;";
+                    lobCmd.CommandText = cmdSql;
+                    lobCmd.Parameters.Add(new OracleParameter("tempLob", OracleType.Clob)).Direction = ParameterDirection.Output;
+                    lobCmd.ExecuteNonQuery();
+
+                    // 利用事务处理（必须）
+                    OracleTransaction tx = connection.BeginTransaction();
+                    lobCmd.Transaction = tx;
+
+                    // 定义一个临时变量
+                    OracleLob tempLob = (OracleLob)lobCmd.Parameters["tempLob"].Value;
+                    tempLob.BeginBatch(OracleLobOpenMode.ReadWrite);
+                    tempLob.Write(array, 0, array.Length);
+                    tempLob.EndBatch();
+                    // 提交事务
+                    tx.Commit();
+                    return tempLob;
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                }
+            }
+        }
