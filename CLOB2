@@ -143,3 +143,18 @@ namespace ConsoleApplication23
       }
 
 }
+
+http://www.xuebuyuan.com/903167.html
+http://www.xuebuyuan.com/
+
+command.CommandText = "select * from table(AnalyseBuffer(:gml))";
+ OracleClob clob = new OracleClob(command.Connection, true, false);
+ //gmlPolygon 大於4000字元長度的字串.
+ char[] cs= gmlPolygon.ToCharArray();
+ clob.Write(cs, 0,cs.Length);
+ OracleParameter para = new OracleParameter("gml", OracleDbType.Clob,clob, ParameterDirection.Input);
+ command.Parameters.Insert(0, para);
+ DataSet ds = new DataSet();
+ OracleDataAdapter ad = new OracleDataAdapter(command);
+ ad.Fill(ds);
+            
