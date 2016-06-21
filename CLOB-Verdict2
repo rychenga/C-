@@ -74,7 +74,8 @@ namespace ODBCOracle
                 //Console.WriteLine(TEXT);
                 _sUpdate = _sUpdate.Substring(0, _sUpdate.Length - 1);
                 _sUpdate = _sUpdate + ") ;";
-                Console.WriteLine(_sUpdate);
+                //Console.WriteLine(_sUpdate);
+                //LIKE: INSERT INTO TARGET (DAY,NAME,TEXT) VALUES ('2016/6/20','RYCHENGA',:myLOB) ;
 
                 //建立ODBC Adapter
                 System.Data.Odbc.OdbcDataAdapter insert = new System.Data.Odbc.OdbcDataAdapter(_sUpdate, _sConnectString);
