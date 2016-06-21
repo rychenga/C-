@@ -1,0 +1,113 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Data.OracleClient;
+
+namespace ODBCOracle
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            try
+            {
+                string _sDB;
+                string _sUser;
+                string _sPwd;
+                string _sPath = "D:\\WORK\\C#\\20160613\\demo.ini";
+                string _sUpdate = "";
+                string TEXT = "";
+
+                //讀取ini by Source for DB
+                _sDB = Actini.Program.ReadIni("Source", "DB", _sPath);
+                //讀取ini by Source for User
+                _sUser = Actini.Program.ReadIni("Source", "UID", _sPath);
+                //讀取ini by Source for Pwd""
+                _sPwd = Actini.Program.ReadIni("Source", "pwd", _sPath);
+                //Console.WriteLine("DB_NAME:{0} User_Name:{1} Password:{2}", _sDB, _sUser, _sPwd);
+
+                //宣告connectString 
+                string _sConnectString = "DSN=" + _sDB + ";UID=" + _sUser + ";PWD=" + _sPwd + ";";
+
+                //宣告sqlcmd
+                string _sSqlcmd = "select * from SOURCE";
+
+                //建立ODBC Adapter
+                System.Data.Odbc.OdbcDataAdapter adapter = new System.Data.Odbc.OdbcDataAdapter(_sSqlcmd, _sConnectString);
+
+                //建立一個DataTable
+                System.Data.DataTable GetDataTable = new System.Data.DataTable();
+
+                //adapter fill data into GetDataTable(DataTable)
+                adapter.Fill(GetDataTable);
+
+                //close adapter
+                adapter.Dispose();
+
+
+                _sUpdate = "INSERT INTO TARGET (";
+                foreach (System.Data.DataRow pri in GetDataTable.Rows)
+                {
+                    foreach (System.Data.DataColumn col in GetDataTable.Columns)
+                    {
+                        _sUpdate = _sUpdate + col.ToString()+",";
+                    }
+
+                    _sUpdate = _sUpdate.Substring(0, _sUpdate.Length - 1);
+                    _sUpdate = _sUpdate + ") VALUES (";
+
+                    foreach (System.Data.DataColumn col in GetDataTable.Columns)
+                    {
+                        if (col.ToString() == "TEXT")
+                        {
+                            //bind variables 
+                            _sUpdate = _sUpdate + ":myLOB,";
+                            TEXT = pri[col].ToString().Trim();
+                        }
+                        else {
+                            //Console.WriteLine("{0}:{1}", col, pri[col]);
+                            _sUpdate = _sUpdate + "'" + pri[col] + "',";
+                        }
+
+                    }                    
+                }
+                Console.WriteLine(TEXT);
+                _sUpdate = _sUpdate.Substring(0, _sUpdate.Length - 1);
+                _sUpdate = _sUpdate + ") ;";
+                Console.WriteLine(_sUpdate);
+
+                //建立ODBC connect
+                System.Data.Odbc.OdbcConnection icon = new System.Data.Odbc.OdbcConnection(_sConnectString);
+
+                //建立一個ODBC Command from odbcconnection
+                System.Data.Odbc.OdbcCommand uCmd = icon.CreateCommand();
+
+                //將insret sql to CommandText
+                uCmd.CommandText = _sUpdate;
+
+                //bind variables by Parameters.Add.Vaule 給值
+                uCmd.Parameters.Clear();
+                uCmd.Parameters.Add("myLOB",OracleType.Clob).Value = TEXT;
+
+                //open connection by DB
+                icon.Open();
+
+                //exec insert
+                uCmd.ExecuteNonQuery();
+
+
+                // close connection by DB
+                icon.Close();
+
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+            Console.ReadKey();
+        }
+    }
+}
