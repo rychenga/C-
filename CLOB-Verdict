@@ -112,3 +112,17 @@ namespace ODBCOracle
         }
     }
 }
+
+
+https://msdn.microsoft.com/en-us/library/ebxy9a8b(v=vs.80).aspx
+https://msdn.microsoft.com/en-us/library/system.data.oracleclient.oracleparametercollection(v=vs.80).aspx
+
+public void AddOracleParameters() 
+ {
+ // ...
+ // create dataSet and adapter
+ // ...
+   adapter.SelectCommand.Parameters.Add("pEName", OracleType.VarChar, 80).Value = "Smith";
+   adapter.SelectCommand.Parameters.Add("pEmpNo", OracleType.Int32).Value = 7369;
+   adapter.Fill(dataSet);
+ 
