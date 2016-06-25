@@ -1,0 +1,232 @@
+這是投影成像的設定
+glMatrixMode(GL_PROJECTION);
+     glLoadIdentity();
+	 //透視投射  
+     gluPerspective( 10/*角度*/, 1/*,觀點*/, 0.1/*近端的裁減平面*/, 10/* 遠端*/ );
+     gluPerspective(60.0, (float)(w/h), 1.0, 5000.0) ;
+
+這是camera的範例
+glMatrixMode(GL_MODELVIEW );
+     glLoadIdentity();
+     gluLookAt( 
+     bmx,bmy,bmz,
+     0,0,0,
+     0,1,0 );
+
+=========================================================================================
+這是說個別化時，避免說這個值影響到其他的方法
+     glPushMatrix ();
+	  //位移
+	  glTranslatef (0.0, 0.0, 0.0); 
+	：
+	 glFlush ();
+   glPopMatrix ();
+=========================================================================================
+這是匯入obj的方法
+
+若要安全debug的話
+事先得先:project->add to project->files 選 glm.cpp
+才可以debug成功！！
+
+直接使用執行檔時
+會出現can't find material 或material render mode requested with no materials defind. 不要理它
+至最後即可開出畫面
+
+1.先宣當list名稱為list_id
+GLuint list_id;
+
+2.可以在display下或init下宣告
+{
+    GLMmodel *glm_model;
+     glm_model= glmReadOBJ( "head.obj" );
+     glmUnitize( glm_model );
+     glmScale( glm_model, .1 );
+     glmFacetNormals( glm_model );
+     glmVertexNormals( glm_model, 90 );
+
+     list_id = glmList( glm_model, GLM_MATERIAL | GLM_SMOOTH );
+
+     glmDelete( glm_model );
+  }
+=========================================================================================
+透明度
+在init下
+1.先宣告Enble
+
+glEnable(GL_BLEND);
+
+2.宣告Function
+
+glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+=========================================================================================
+深度的判定
+
+在init下
+1.先宣告Enble
+
+glEnable(GL_DEPTH_TEST);
+
+2.宣告Function
+
+glDepthFunc(GL_LEQUAL);
+
+3.在display下的glClear
+
+glClear(原先的===> GL_COLOR_BUFFER_BIT|增加這個指令==>GL_DEPTH_BUFFER_BIT );
+=========================================================================================
+Tick的用法
+
+事先要宣告time、timebase
+
+1.建立一個副程式叫getTick()
+void getTick()
+{
+	static char s[80];
+
+	time = glutGet(GLUT_ELAPSED_TIME);
+	sprintf(s,"Tick/舊版:%d",(time-timebase));
+	glutSetWindowTitle(s);
+	timebase = time;		
+}
+
+2.在display下呼叫getTick即可
+//Tick的計碌
+ getTick();
+=========================================================================================
+FPS的使用法
+
+事先要宣告frame、time、timebase
+
+1.在display下宣告
+//FPS的計碌
+frame++;
+	time=glutGet(GLUT_ELAPSED_TIME);
+	if (time - timebase > 1000) {
+		sprintf(s,"FPS:%4.2f",frame*1000.0/(time-timebase));
+		glutSetWindowTitle(s);
+		timebase = time;		
+		frame = 0;
+	}
+=========================================================================================
+宣告視窗內大小的定義
+
+void myReshape(int w, int h)
+{
+    glViewport(0, 0, w, h);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+   //glOrtho(-2.0,2.0,-2.0,2.0,-2.0,2.0);
+
+    if (w <= h)
+        glOrtho(-2.0, 2.0, -2.0 * (GLfloat) h / (GLfloat) w,
+            2.0 * (GLfloat) h / (GLfloat) w, -10.0, 10.0);
+    else
+        glOrtho(-2.0 * (GLfloat) w / (GLfloat) h,
+            2.0 * (GLfloat) w / (GLfloat) h, -2.0, 2.0, -10.0, 10.0);
+		
+    glMatrixMode(GL_MODELVIEW);
+}
+=========================================================================================
+鍵盤的用法
+
+1.在main下宣告
+glutKeyboardFunc(keyboard); // 向 glut 註冊按鍵函式
+
+2.建一個副程式叫keyboard的
+//鍵盤控制部份
+void keyboard( unsigned char key, int x, int y )
+{
+  switch( key )
+  {
+    case 'd':
+		if(bmx<=17.5)
+		{
+			bmx += .5;
+		}
+     
+     glutPostRedisplay();//將值傳回
+     break;
+    case 'a':
+		if(bmx>=0.5)
+		{
+			bmx -= .5;
+		}
+     glutPostRedisplay();
+     break;
+
+  }
+}
+
+=========================================================================================
+List的用法
+
+1.先宣告list名稱
+GLuint listName<=====名稱;
+
+2.可在init()或是在display宣告
+名稱===>listName = glGenLists (1);
+   glNewList (名稱==>listName, GL_COMPILE);
+	'
+	'宣告繪圖區
+	'
+	'
+	'
+   glEndList ();
+
+3.在display中呼叫即可
+
+glCallList (listName<==名稱);
+
+=========================================================================================
+旋轉角度的方法
+
+1.宣告角度的變數
+
+static GLfloat spin = 0.0;
+
+2.建立一個副程式計算角度
+//旋轉角度
+void spinDisplay(void) {
+	spin = spin + 0.05;
+	if (spin > 360.0)
+		spin = spin - 360.0;
+	glutPostRedisplay();
+}
+
+3.在繪圖的物件上加入
+glRotatef(spin, 0.0, 0.0, 1.0);
+
+=========================================================================================
+Mouse的被動、與主動
+
+1.在main下
+
+glutMouseFunc(mouse);
+
+A:
+glutPassiveMotionFunc(drawSquare);//滑鼠自動會出現圖
+
+B:
+glutMotionFunc(drawSquare);//滑鼠按下去後才會出現圖
+
+2.建立一個Mouse的副程式
+//滑鼠控制
+void mouse(int btn, int state, int x, int y)
+{
+	if(btn==GLUT_RIGHT_BUTTON && state==GLUT_DOWN) exit(0);
+	if(btn==GLUT_LEFT_BUTTON && state==GLUT_DOWN) AfterState==GLUT_DOWN;
+	if(btn==GLUT_LEFT_BUTTON && state==GLUT_UP && AfterState==GLUT_DOWN) drawSquare(x, y);
+}
+
+=========================================================================================
+時間功能
+1.在main下
+glutTimerFunc(30/*最大越慢*/, OnTime, 1);
+
+2.
+void OnTime(int value)
+{
+	glutPostRedisplay();
+	glutTimerFunc(30, OnTime, 1);
+}
+================================================================================================
