@@ -1,0 +1,76 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
+
+namespace ConsoleApplication1
+{
+    class Program
+    {
+        static EventWaitHandle _signal;
+        static EventWaitHandle _signalEq1;
+        static EventWaitHandle _signalEq2;
+        static EventWaitHandle _signalEq3;
+        static void Main(string[] args)
+        {
+            _signal = new EventWaitHandle(false, EventResetMode.ManualReset);
+            _signalEq1 = new EventWaitHandle(false, EventResetMode.ManualReset);
+            _signalEq2 = new EventWaitHandle(false, EventResetMode.ManualReset);
+            _signalEq3 = new EventWaitHandle(false, EventResetMode.ManualReset);
+            Thread t1 = new Thread(RunScanEqGroup1);
+            Thread t2 = new Thread(RunScanEqGroup2);
+            Thread tReport = new Thread(RunReport);
+            t1.IsBackground = true;
+            t2.IsBackground = true;
+            tReport.IsBackground = true;
+            t1.Start();
+            t2.Start();
+            tReport.Start();
+            Console.ReadKey();
+        }
+        static void RunScanEqGroup1()
+        {
+            while (true)
+            {
+                Thread.Sleep(1000);
+                Console.WriteLine("Eq#1 Data Return");
+                Thread.Sleep(1000);
+                Console.WriteLine("Eq#2 Data Return");
+                Thread.Sleep(1000);
+                Console.WriteLine("Eq#3 Data Return");
+
+                _signalEq1.Set();
+            }
+        }
+        static void RunScanEqGroup2()
+        {
+            while (true)
+            {
+                Thread.Sleep(5000);
+                Console.WriteLine("Eq#4 Data Return");
+                Thread.Sleep(5000);
+                Console.WriteLine("Eq#5 Data Return");
+                Thread.Sleep(5000);
+                Console.WriteLine("Eq#6 Data Return");
+               
+                _signalEq2.Set();
+            }
+        }
+        static void RunReport()
+        {
+            while (true)
+            {
+                EventWaitHandle[] signals = new EventWaitHandle[] 
+                {
+                    _signalEq1, 
+                    _signalEq2
+                };
+                EventWaitHandle.WaitAll(signals);
+                Console.WriteLine("Marge Group1 and 2 process report");
+                _signalEq1.Reset();
+                _signalEq2.Reset();
+            }
+        }
+    }
+}
