@@ -1,0 +1,48 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Xml;
+using System.IO;
+
+namespace xmlRep
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            XmlDocument doc = new XmlDocument();
+            //doc.LoadXml("<book genre='novel' ISBN='1-861001-57-5'>" +
+            //            "<title>Pride And Prejudice</title>" +
+            //            "</book>");
+            string _sPath = (@"D:\WORK\20161125\");
+            string _sFielName = _sPath + "rychenga.xml";
+            try
+            {
+                //Load the the document with the last book node.
+                XmlTextReader reader = new XmlTextReader(_sFielName);                
+                doc.Load(reader);
+                Console.WriteLine(doc.OuterXml);
+                XmlNode root = doc.DocumentElement;
+
+                //Create a new title element.
+                XmlElement elem = doc.CreateElement("test");
+                //elem.InnerText = "The Handmaid's Tale";
+                elem.InnerXml = "rychenga is good man!!";
+
+                //Replace the title element.
+                //root.ReplaceChild(elem, root.FirstChild);
+                root.ReplaceChild(elem, root.SelectSingleNode("test"));
+
+                Console.WriteLine("Display the modified XML...");
+                //doc.Save(Console.Out);
+                Console.WriteLine(root.OuterXml);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+
+            Console.ReadKey();
+        }
+    }
+}
