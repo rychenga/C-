@@ -25,11 +25,15 @@ namespace demo1
             //textBox1.Text = _comPLC.Parity.ToString();
             //MessageBox.Show(_comPLC.StopBits.ToString());
             //listBox1.Text = _comPLC.PortName;
-            listBox1.Items.Add(_comPLC.PortName);
-            listBox1.Items.Add(_comPLC.BaudRate);
-            listBox1.Items.Add(_comPLC.Parity);
-            listBox1.Items.Add(_comPLC.DataBits);
-            listBox1.Items.Add(_comPLC.StopBits);
+            //listBox1.Items.Add(_comPLC.PortName);
+            //listBox1.Items.Add(_comPLC.BaudRate);
+            //listBox1.Items.Add(_comPLC.Parity);
+            //listBox1.Items.Add(_comPLC.DataBits);
+            //listBox1.Items.Add(_comPLC.StopBits);
+            listBox1.Items.Add("COM Poart: "+_comPLC.PortName + " , "+_comPLC.BaudRate + " , " + _comPLC.Parity + " , " + _comPLC.DataBits + " , " + _comPLC.StopBits + " ;");
+            listBox1.Items.Add("--------------------------------------------------------------------------");
+            _comPLC.Open(); //open COM1
+            _comPLC.Close(); // close COM1
         }
     }
 }
