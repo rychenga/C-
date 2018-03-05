@@ -36,24 +36,25 @@ namespace demo
             int _iDataBits;
             string _sStopBits;
             StopBits _ssStopBits;
-            string _sPath = "D:\\work\\C#\\20180305\\demo2\\demo\\bin\\Debug\\demo.ini";
+            //string _sPath = "D:\\work\\C#\\20180305\\demo2\\demo\\bin\\Debug\\demo.ini";
+            string _sPath = textBox1.Text;
 
-                //讀取ini by Source for COM
-                _sCOM = Actini.Program.ReadIni("Source", "COM", _sPath);
-                //讀取ini by Source for BaudRate
-                _iBaudRate = Convert.ToInt32(Actini.Program.ReadIni("Source", "BaudRate", _sPath));
-                //讀取ini by Source for Parity
-                _sParity = Actini.Program.ReadIni("Source", "Parity", _sPath);
-                _pParity = (Parity)Enum.Parse(typeof(Parity), _sParity);
-                //讀取ini by Source for DataBits
-                _iDataBits = Convert.ToInt32(Actini.Program.ReadIni("Source", "DataBits", _sPath));
-                //讀取ini by Source for Stopv(Parity)Enum.Parse(typeof(Parity), _sParity);Bits
-                _sStopBits = Actini.Program.ReadIni("Source", "StopBits", _sPath);
-                _ssStopBits = (StopBits)Enum.Parse(typeof(StopBits), _sStopBits);
+            //讀取ini by Source for COM
+            _sCOM = Actini.Program.ReadIni("Source", "COM", _sPath);
+            //讀取ini by Source for BaudRate
+            _iBaudRate = Convert.ToInt32(Actini.Program.ReadIni("Source", "BaudRate", _sPath));
+            //讀取ini by Source for Parity
+            _sParity = Actini.Program.ReadIni("Source", "Parity", _sPath);
+            _pParity = (Parity)Enum.Parse(typeof(Parity), _sParity);
+            //讀取ini by Source for DataBits
+            _iDataBits = Convert.ToInt32(Actini.Program.ReadIni("Source", "DataBits", _sPath));
+            //讀取ini by Source for Stopv(Parity)Enum.Parse(typeof(Parity), _sParity);Bits
+            _sStopBits = Actini.Program.ReadIni("Source", "StopBits", _sPath);
+            _ssStopBits = (StopBits)Enum.Parse(typeof(StopBits), _sStopBits);
 
-                //宣告COM1 (COM1,115200,偶數,8,Stopbite 2)
-                //_comPLC = new SerialPort("COM4", 115200, Parity.Even, 8, StopBits.Two);
-                _comPLC = new SerialPort(_sCOM, _iBaudRate, _pParity, _iDataBits, _ssStopBits);
+            //宣告COM1 (COM1,115200,偶數,8,Stopbite 2)
+            //_comPLC = new SerialPort("COM4", 115200, Parity.Even, 8, StopBits.Two);
+            _comPLC = new SerialPort(_sCOM, _iBaudRate, _pParity, _iDataBits, _ssStopBits);
             
             //MessageBox.Show(_sCOM.ToString());
         }
@@ -95,6 +96,8 @@ namespace demo
         {
             this.Hide();
             Form2 f2 = new Form2();
+            //將form1 textBox1.TEXT 給 Form2 String1
+            f2.String1 = textBox1.Text;
             f2.Show();
         }
 
@@ -117,3 +120,4 @@ namespace demo
         }
     }
 }
+
