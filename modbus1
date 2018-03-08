@@ -9,32 +9,6 @@ namespace modbus1
     class Program
     {
         //========== member function
-        public void WriteAsciiCrc(int station, int function, int address, int data)
-        {
-            byte byteCRCL, byteCRCH;
-            GetCRC(out byteCRCL, out byteCRCH,
-                (byte)station,
-                (byte)function,
-                HSB(address),
-                LSB(address),
-                HSB(data),
-                LSB(data));
-            Send(
-                (byte)station,
-                (byte)function,
-                HSB(address),
-                LSB(address),
-                HSB(data),
-                LSB(data),
-                byteCRCL,
-                byteCRCH
-                );
-        }
-        public void Send(params byte[] data)
-        {
-            //this.Write(data, 0, data.Count());
-            Console.WriteLine("Send: {0}", string.Join(",", data));
-        }
         //========== check sum
         public static void GetCRC(out byte Lsb, out byte Hsb, params int[] data)
         {
