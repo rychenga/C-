@@ -1,0 +1,95 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace modbus1
+{
+    class Program
+    {
+        //========== member function
+        public void WriteAsciiCrc(int station, int function, int address, int data)
+        {
+            byte byteCRCL, byteCRCH;
+            GetCRC(out byteCRCL, out byteCRCH,
+                (byte)station,
+                (byte)function,
+                HSB(address),
+                LSB(address),
+                HSB(data),
+                LSB(data));
+            Send(
+                (byte)station,
+                (byte)function,
+                HSB(address),
+                LSB(address),
+                HSB(data),
+                LSB(data),
+                byteCRCL,
+                byteCRCH
+                );
+        }
+        public void Send(params byte[] data)
+        {
+            //this.Write(data, 0, data.Count());
+            Console.WriteLine("Send: {0}", string.Join(",", data));
+        }
+        //========== check sum
+        public static void GetCRC(out byte Lsb, out byte Hsb, params int[] data)
+        {
+            int wResult = 0xFFFF;
+            for (int nIdx = 0; nIdx < data.Length; nIdx++)
+            {
+                wResult ^= data[nIdx];
+                for (int j = 0; j < 8; j++)
+                {
+                    if ((wResult & 0x01) > 0) wResult = (wResult >> 1) ^ 0xA001;
+                    else wResult = wResult >> 1;
+                }
+            }
+            Lsb = (byte)(wResult & 0xFF); //Lsb
+            Hsb = (byte)(wResult >> 0x8); //Hsb
+        }
+        public static byte HSB(int Word) { return (byte)(Word >> 8); }
+        public static byte LSB(int Word) { return (byte)(Word & 0xFF); }
+        static void Main(string[] args)
+        {
+            try
+            {
+                //宣告bytes 陣列
+                List<int> lstDatas = new List<int>();
+
+                while (true)
+                {
+                    Console.WriteLine("Input a number (input -1 and completed):");
+                    int nInput = Convert.ToInt32(Console.ReadLine());
+                    if (nInput < 0) break;
+
+                    lstDatas.Add(nInput);
+                }
+
+                Console.WriteLine("Data: ");
+                for (int nIdx = 0; nIdx < lstDatas.Count; nIdx++)
+                {
+                    Console.Write(lstDatas[nIdx]);
+                    Console.Write(",");
+                }
+                byte byteCRCL, byteCRCH;
+                GetCRC(out byteCRCL, out byteCRCH, lstDatas.ToArray());
+                Console.WriteLine(Convert.ToString(byteCRCL, 16));
+                Console.WriteLine(Convert.ToString(byteCRCH, 16));
+            }
+            catch (Exception e)
+            {
+                string error = string.Format("---\nThe following error occurred while executing the snippet:\n{0}\n---", e.ToString());
+                Console.WriteLine(error);
+            }
+            finally
+            {
+                Console.Write("Press any key to continue...");
+                Console.ReadKey();
+            }
+        }
+    }
+}
