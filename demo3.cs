@@ -38,22 +38,25 @@ namespace demo3
             Console.WriteLine("Read get count {0}", _comPLC.BytesToRead);
             try
             { 
+                //如果ports(COM)不通就離開
                 if (!_comPLC.IsOpen) return;
-
+                //當收到ports data 大於0
                 while (_comPLC.BytesToRead > 0)
                 {
                     char rec = (char)_comPLC.ReadChar();
                     _strLastData += rec;
-
+                    //轉換char -> int -> byte
                     int _iGet = Convert.ToInt32(rec);
                     byte _bGet = Convert.ToByte(_iGet);
+                    //收進_lInget (list)
                     _lInget.Add(_bGet);
-
+                    //如果rec 只有換行符號的話，直接將_strLastData 清空
                     if (_strLastData.EndsWith(_cstrTrail))
                     {
                         _strLastData = string.Empty;
                     }
                 }
+                //如果_lInget (list) 沒收到半筆資料的話就離開
                 if (_lInget.Count == 0) return;
                 Console.WriteLine("OUT DATA : ");
                 for (int i = 0; i < _lInget.Count; i++)
@@ -61,6 +64,7 @@ namespace demo3
                     Console.Write(_lInget[i]);
                     Console.Write(",");
                 }
+                //檢查CRC
                 byte byteCRCL, byteCRCH;
                 GetCRC(out byteCRCL, out byteCRCH, _lInget.ToArray());
                 Console.WriteLine("{0},{1}", Convert.ToString(byteCRCL, 16), Convert.ToString(byteCRCH, 16));
@@ -115,9 +119,9 @@ namespace demo3
                 // Set the read/write timeouts
                 _comPLC.ReadTimeout = 500;
                 _comPLC.WriteTimeout = 500;
-                // open connect ports
+                // open connect ports(COM)
                 _comPLC.Open();
-
+                //send data to ports(COM)
                 _comPLC.Write(data, 0, _lInput.Count);
                 Console.ReadKey();
                 //_comPLC.WriteLine("test by rychenga");
