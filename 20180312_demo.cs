@@ -24,13 +24,17 @@ namespace demo1
                 int _iFunction = Convert.ToInt32(Console.ReadLine());
                 Console.WriteLine("Input Address:");
                 int _iAddress = Convert.ToInt32(Console.ReadLine());
-                Console.WriteLine("Input data:");
+                Console.WriteLine("Input data(data count):");
                 int _iData = Convert.ToInt32(Console.ReadLine());
                     
                 _comPLC.Open();
 
-                //_comPLC.WriteRtuCrc(01,03,000000,01);
-                _comPLC.WriteRtuCrc(_iStation, _iFunction, _iAddress, _iData);
+                for (int i = 0; i < _iData; i++)
+                {
+                    //_comPLC.WriteRtuCrc(01,03,000000,01);
+                    _comPLC.WriteRtuCrc(_iStation, _iFunction, _iAddress, _iData);
+                    _iAddress ++;
+                }
 
                 Console.ReadKey();
             }
