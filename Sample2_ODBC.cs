@@ -12,11 +12,7 @@ namespace Jeff.DB
         public string Ssqlcmd;
         public string SsPath;
         public DataTable GetDataTable;
-
-
-        //public List<string> columns = new List<string>();
-        //public List<List<string>> rows = new List<List<string>>();
-        //private List<string> _tempRows = new List<string>();
+        
         private OdbcDataAdapter _adapter;
         private string _sDB;
         private string _sUser;
@@ -42,26 +38,6 @@ namespace Jeff.DB
             GetDataTable = new DataTable();
             //adapter fill data into GetDataTable(DataTable)
             _adapter.Fill(GetDataTable);
-
-            ////get columns name
-            //foreach (System.Data.DataColumn col in GetDataTable.Columns)
-            //{
-            //    columns.Add(col.ToString());
-            //}
-
-            ////get rowdata by 2 Array
-            //foreach (System.Data.DataRow pri in GetDataTable.Rows)
-            //{
-            //    _tempRows = new List<string>();
-
-            //    foreach (System.Data.DataColumn col in GetDataTable.Columns)
-            //    {
-            //        //Console.WriteLine("{0}:{1}", col, pri[col]);
-            //        _tempRows.Add(pri[col].ToString());
-            //    }
-            //    rows.Add(_tempRows);
-            //}
-
         }
 
     }
