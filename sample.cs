@@ -1,4 +1,6 @@
-[C#視窗]Ado.net連接Access資料庫的四種方式
+//http://einboch.pixnet.net/blog/post/245703881-c%23%E5%B0%8Daccess%E6%AA%94%E6%A1%88%E9%80%B2%E8%A1%8C%E5%A2%9E%E3%80%81%E5%88%AA%E3%80%81%E6%9F%A5%E3%80%81%E6%94%B9%E5%8A%9F%E8%83%BD
+//http://j796160836.pixnet.net/blog/post/26514348-%5Bc%23%E8%A6%96%E7%AA%97%5Dado.net%E9%80%A3%E6%8E%A5access%E8%B3%87%E6%96%99%E5%BA%AB%E7%9A%84%E5%9B%9B%E7%A8%AE%E6%96%B9%E5%BC%8F
+//[C#視窗]Ado.net連接Access資料庫的四種方式
 
 //***Access(ODBC Version)
 //[OdbcConnection->OdbcDataAdapter->DataSet->dataGridView1]
