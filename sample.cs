@@ -20,7 +20,6 @@ namespace ERP
 
         private void button1_Click(object sender, EventArgs e)
         {
-
             try
             {
                 //清空DataGrivew row data(DataSource = null)
@@ -124,6 +123,14 @@ namespace ERP
             DTReader = null;//清空表讀取對像
             olecon.Close();//關閉資料庫連接
             cbox_SheetName.SelectedIndex = 0;//設定下拉列表預設選項為第一項
+        }
+
+        private void button1_Click_1(object sender, EventArgs e)//選取datagrview data
+        {
+            for (int i = 0; i < dgvTable.SelectedCells.Count; i++)
+            {
+                MessageBox.Show(dgvTable.SelectedCells[i].Value.ToString());
+            }
         }
     }
 }
