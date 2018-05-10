@@ -80,10 +80,12 @@ namespace sample
 
                 if (txt_Path.Text != "")
                 {
+                    //DataGridView 顯示 row data
                     DataTable dt = _smdb.GetOleDbDataTable(txt_Path.Text, sql);
                     dgvTable.DataSource = dt;
                     dt = null;
 
+                    //Chart 顯示 統計結果
                     DataTable dt2 = _smdb.GetOleDbDataTable(txt_Path.Text, sql2);
                     series1.Points.AddXY(dt2.Columns[0].ToString(), dt2.Rows[0].ItemArray[0]);                    
                     this.chart1.Series.Add(series1);//將線畫在圖上
