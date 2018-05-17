@@ -22,27 +22,17 @@ namespace Jeff.DB
             icn.ConnectionString = cnstr;
             if (icn.State == ConnectionState.Open) icn.Close();
             icn.Open();//打開資料庫連接
-            return icn;
+            return icn;//回傳OleDbConnection
         }
 
-        public List<string> GetTableList(string Txt_path)//對下拉列表進行資料繫結
+        //對資料表進行新增、修改及刪除等功能
+        public static void OleDbInsertUpdateDelete(string Database, string OleDbSelectString)
         {
             //連接Access資料庫 & 打開資料庫連接
-            OleDbConnection olecon = OleDbOpenConn(Txt_path);
-
-            //連接Access資料庫
-            System.Data.DataTable DTable = olecon.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, new object[] { null, null, null, "TABLE" });//實例化表對像
-
-            DataTableReader DTReader = new DataTableReader(DTable);//實例化表讀取對像
-            while (DTReader.Read())//循環讀取
-            {
-                P_str_Name.Add(DTReader["Table_Name"].ToString().Replace('$', ' ').Trim());//記錄工作表名稱
-            }
-
-            DTable = null;//清空表對像
-            DTReader = null;//清空表讀取對像
-            olecon.Close();//關閉資料庫連接
-            return P_str_Name;
+            OleDbConnection icn = OleDbOpenConn(Database);
+            OleDbCommand cmd = new OleDbCommand(OleDbSelectString, icn);
+            cmd.ExecuteNonQuery();
+            if (icn.State == ConnectionState.Open) icn.Close();
         }
 
         //取得 MDB table raw data
@@ -67,7 +57,27 @@ namespace Jeff.DB
             //從ds DataSet取得資料，並存至DataTable的 myDataTable內
             myDataTable = ds.Tables[0];
             if (icn.State == ConnectionState.Open) icn.Close();
-            return myDataTable;
+            return myDataTable;//回傳DataTable
+        }
+
+        public List<string> GetTableList(string Txt_path)//對下拉列表進行資料繫結
+        {
+            //連接Access資料庫 & 打開資料庫連接
+            OleDbConnection olecon = OleDbOpenConn(Txt_path);
+
+            //連接Access資料庫
+            System.Data.DataTable DTable = olecon.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, new object[] { null, null, null, "TABLE" });//實例化表對像
+
+            DataTableReader DTReader = new DataTableReader(DTable);//實例化表讀取對像
+            while (DTReader.Read())//循環讀取
+            {
+                P_str_Name.Add(DTReader["Table_Name"].ToString().Replace('$', ' ').Trim());//記錄工作表名稱
+            }
+
+            DTable = null;//清空表對像
+            DTReader = null;//清空表讀取對像
+            olecon.Close();//關閉資料庫連接
+            return P_str_Name;//回傳List
         }
 
     }
