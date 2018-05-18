@@ -111,12 +111,19 @@ namespace sample
         //DataGridView選中儲存格時整個行背景變色
         private void Form1_Load(object sender, EventArgs e)
         {
+            //DataGridView選中儲存格時整個行背景變色
             //設定如何選擇儲存格
             dgvTable.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             //選中儲存格的前景色
             dgvTable.DefaultCellStyle.SelectionForeColor = Color.Blue;
             //選中儲存格的背景色
             dgvTable.DefaultCellStyle.SelectionBackColor = Color.LightYellow;
+            
+            //根據桌面大小調整視窗大小
+            int DeskWidth = Screen.PrimaryScreen.WorkingArea.Width;//取得桌面寬度
+            int DeskHeight = Screen.PrimaryScreen.WorkingArea.Height;//取得桌面高度
+            this.Width = Convert.ToInt32(DeskWidth * 0.8);//設定視窗寬度
+            this.Height = Convert.ToInt32(DeskHeight * 0.8);//設定視窗高度
         }
     }
 }
